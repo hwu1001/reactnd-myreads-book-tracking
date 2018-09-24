@@ -6,11 +6,8 @@ import Shelf from './Shelf'
 // TODOs
 // Implement router
 // Add search page
-// Implement callbacks for shelf changes
-//  Set onChange for the shelf changer component
 // Implement shelf changer component
 // Look into form serializer for state changes on books
-// Handle updates with API calls
 // Handle searches with API
 
 class BooksApp extends React.Component {
@@ -36,14 +33,23 @@ class BooksApp extends React.Component {
       });
   }
 
-  updateBook = (shelf, bookId) => {
+  updateBook = (shelf, changedBook) => {
     const copy = [];
     this.state.books.forEach((book) => {
-      if (book.id === bookId) {
+      if (book.id === changedBook.id) {
         book.shelf = shelf;
       }
       copy.push(book);
     });
+    // Just log the update for now to compare. The API output here is
+    // shelfType: [id1, id2, etc.], where shelfType is 'currentlyReading', 'read', 'wantToRead'
+    BooksAPI.update(changedBook, shelf)
+      .then((books) => {
+        console.log(books);
+      })
+      .catch(() => {
+        console.log('update Api call failed');
+      })
     this.setState(() => ({ books: copy }));
   }
 
@@ -79,8 +85,6 @@ class BooksApp extends React.Component {
           </div>
         ) : (
             <div className="list-books">
-            {console.log('debug')}
-            {console.log(this.state.books)}
               <div className="list-books-title">
                 <h1>MyReads</h1>
               </div>
@@ -98,9 +102,6 @@ class BooksApp extends React.Component {
                       />
                     )
                   })}
-                  {/* <Shelf books={this.state.books.filter((b) => b.shelf === 'currentlyReading')} shelfName={this.shelves[b.shelf]} shelfType={b.shelf} key="currentlyReading" />
-                  <Shelf books={this.state.books.filter((b) => b.shelf === 'wantToRead')} shelfName={this.shelves[b.shelf]} shelfType={b.shelf} key="wantToRead" />
-                  <Shelf books={this.state.books.filter((b) => b.shelf === 'read')} shelfName={this.shelves[b.shelf]} shelfType={b.shelf} key="read" /> */}
                 </div>
               </div>
               <div className="open-search">

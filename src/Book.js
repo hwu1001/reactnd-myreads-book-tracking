@@ -20,7 +20,7 @@ class Book extends Component {
             {/* https://reactjs.org/docs/forms.html */}
               <select 
                 value={bookStatus} 
-                onChange={(event) => onShelfChange(event.target.value, book.id)}
+                onChange={(event) => onShelfChange(event.target.value, book)}
               >
                 <option value="move" disabled>Move to...</option>
                 <option value="currentlyReading">Currently Reading</option>
