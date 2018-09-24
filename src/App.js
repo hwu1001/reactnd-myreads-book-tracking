@@ -7,6 +7,7 @@ import Shelf from './Shelf'
 // Implement router
 // Add search page
 // Implement callbacks for shelf changes
+//  Set onChange for the shelf changer component
 // Implement shelf changer component
 // Look into form serializer for state changes on books
 // Handle updates with API calls
@@ -24,10 +25,10 @@ class BooksApp extends React.Component {
     books: [],
 
   }
+
   componentDidMount() {
     BooksAPI.getAll()
       .then((books) => {
-        console.log(books);
         this.setState({ books });
       })
       .catch(() => {
@@ -35,7 +36,24 @@ class BooksApp extends React.Component {
       });
   }
 
+  updateBook = (shelf, bookId) => {
+    const copy = [];
+    this.state.books.forEach((book) => {
+      if (book.id === bookId) {
+        book.shelf = shelf;
+      }
+      copy.push(book);
+    });
+    this.setState(() => ({ books: copy }));
+  }
+
   render() {
+    // Ideally these display names would come from the server but we'll hardcode them for now
+    const shelves = {
+      'currentlyReading': 'Currently Reading',
+      'wantToRead': 'Want To Read',
+      'read': 'Read',
+    };
     return (
       <div className="app">
         {this.state.showSearchPage ? (
@@ -61,14 +79,28 @@ class BooksApp extends React.Component {
           </div>
         ) : (
             <div className="list-books">
+            {console.log('debug')}
+            {console.log(this.state.books)}
               <div className="list-books-title">
                 <h1>MyReads</h1>
               </div>
               <div className="list-books-content">
                 <div>
-                  <Shelf books={this.state.books.filter((b) => b.shelf === 'currentlyReading')} shelfName="Currently Reading" key="currentlyReading" />
-                  <Shelf books={this.state.books.filter((b) => b.shelf === 'wantToRead')} shelfName="Want To Read" key="wantToRead" />
-                  <Shelf books={this.state.books.filter((b) => b.shelf === 'read')} shelfName="Read" key="read" />
+                  {/* https://stackoverflow.com/a/47402440 */}
+                  {Object.keys(shelves).map((k) => {
+                    return (
+                      <Shelf 
+                        books={this.state.books.filter((b) => b.shelf === k)} 
+                        shelfName={shelves[k]}
+                        shelfType={k}
+                        onShelfChange={this.updateBook}
+                        key={k}
+                      />
+                    )
+                  })}
+                  {/* <Shelf books={this.state.books.filter((b) => b.shelf === 'currentlyReading')} shelfName={this.shelves[b.shelf]} shelfType={b.shelf} key="currentlyReading" />
+                  <Shelf books={this.state.books.filter((b) => b.shelf === 'wantToRead')} shelfName={this.shelves[b.shelf]} shelfType={b.shelf} key="wantToRead" />
+                  <Shelf books={this.state.books.filter((b) => b.shelf === 'read')} shelfName={this.shelves[b.shelf]} shelfType={b.shelf} key="read" /> */}
                 </div>
               </div>
               <div className="open-search">

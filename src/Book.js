@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 class Book extends Component {
   render() {
-    const { book } = this.props;
+    const { book, bookStatus, onShelfChange } = this.props;
     const style = {
       width: 128,
       height: 193,
@@ -17,7 +17,11 @@ class Book extends Component {
             <div className="book-cover" style={style}>
             </div>
             <div className="book-shelf-changer">
-              <select>
+            {/* https://reactjs.org/docs/forms.html */}
+              <select 
+                value={bookStatus} 
+                onChange={(event) => onShelfChange(event.target.value, book.id)}
+              >
                 <option value="move" disabled>Move to...</option>
                 <option value="currentlyReading">Currently Reading</option>
                 <option value="wantToRead">Want to Read</option>
@@ -44,7 +48,10 @@ Book.propTypes = {
       smallThumbnail: PropTypes.string,
       thumbnail: PropTypes.string.isRequired,
     }),
+    id: PropTypes.string.isRequired,
   }).isRequired,
+  bookStatus: PropTypes.string.isRequired,
+  onShelfChange: PropTypes.func.isRequired,
 };
 
 export default Book
