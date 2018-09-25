@@ -6,11 +6,9 @@ import Shelf from './Shelf'
 import Search from './Search'
 
 // TODOs
-// Implement router
-// Add search page
-// Implement shelf changer component
-// Look into form serializer for state changes on books
 // Handle searches with API
+// Handle state between search page and main page (needs to be in sync)
+// Change data model for client to hold information for each bucket? (Need to use in search - there's no shelf returned in search API)
 
 class BooksApp extends React.Component {
   state = {
@@ -36,12 +34,17 @@ class BooksApp extends React.Component {
 
   updateBook = (shelf, changedBook) => {
     const copy = [];
+    let inCurrentBooks = false;
     this.state.books.forEach((book) => {
       if (book.id === changedBook.id) {
         book.shelf = shelf;
+        inCurrentBooks = true;
       }
       copy.push(book);
     });
+    if (!inCurrentBooks) {
+      copy.push(changedBook);
+    }
     // Just log the update for now to compare. The API output here is
     // shelfType: [id1, id2, etc.], where shelfType is 'currentlyReading', 'read', 'wantToRead'
     BooksAPI.update(changedBook, shelf)
@@ -91,7 +94,7 @@ class BooksApp extends React.Component {
             </div>
           )} />
           <Route path='/search' render={({ history }) => (
-            <Search />
+            <Search onShelfChange={this.updateBook} />
           )} />
         </div>
       </BrowserRouter>

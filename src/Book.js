@@ -19,7 +19,10 @@ class Book extends Component {
             <div className="book-shelf-changer">
             {/* https://reactjs.org/docs/forms.html */}
               <select 
-                value={bookStatus} 
+              // this doesn't work currently, but we need a way to accomplish this
+              // so that in search we show the same status for the book that we have on
+              // the main app page
+                value={book.shelf || bookStatus} 
                 onChange={(event) => onShelfChange(event.target.value, book)}
               >
                 <option value="move" disabled>Move to...</option>
@@ -31,7 +34,7 @@ class Book extends Component {
             </div>
           </div>
           <div className="book-title">{book.title}</div>
-          {book.authors.map((author) => (
+          {book.authors && book.authors.map((author) => (
             <div key={author} className="book-authors">{author}</div>
           ))}
         </div>
@@ -43,7 +46,7 @@ class Book extends Component {
 Book.propTypes = {
   book: PropTypes.shape({
     title: PropTypes.string.isRequired,
-    authors: PropTypes.array.isRequired,
+    authors: PropTypes.array, // this isn't always returned in the API
     imageLinks: PropTypes.shape({
       smallThumbnail: PropTypes.string,
       thumbnail: PropTypes.string.isRequired,
