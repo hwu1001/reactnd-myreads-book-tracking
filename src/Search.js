@@ -21,10 +21,14 @@ class Search extends Component {
   }
 
   searchForBooks = (query) => {
+    // If there's no query don't call the API
+    if (!query) {
+      return;
+    }
     BooksAPI.search(query)
       .then((books) => {
         console.log(books);
-        if (!books.error) {
+        if (books && !books.error) {
           books.sort(sortBy('title'));
           this.setState({ searchResults : books });
         }
@@ -42,7 +46,7 @@ class Search extends Component {
   }
 
   render() {
-    const { onShelfChange } = this.props;
+    const { booksAndShelves, onShelfChange } = this.props;
     const { query, searchText, searchResults } = this.state;
 
     return (
@@ -71,7 +75,7 @@ class Search extends Component {
         <div className="search-books-results">
           {/* <ol className="books-grid"></ol> */}
           {searchResults.length > 0 ? (
-            <Shelf books={searchResults} shelfName={'Search Results'} shelfType={'move'} onShelfChange={onShelfChange}/>
+            <Shelf books={searchResults} shelfName={'Search Results'} shelfType={'move'} booksAndShelves={booksAndShelves} onShelfChange={onShelfChange}/>
           ) : (
             <div>{searchText}</div>
           )}

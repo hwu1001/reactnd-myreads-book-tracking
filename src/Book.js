@@ -2,8 +2,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
 class Book extends Component {
+  state = {
+    shelfType: '',
+  }
+
+  _handleShelfChange = (shelfType, onShelfChangeCb, book) => {
+    onShelfChangeCb(shelfType, book);
+    this.setState({ shelfType : shelfType});
+  }
+
   render() {
-    const { book, bookStatus, onShelfChange } = this.props;
+    const { book, bookStatus, booksAndShelves, onShelfChange } = this.props;
+    const { shelfType } = this.state;
     const style = {
       width: 128,
       height: 193,
@@ -19,11 +29,12 @@ class Book extends Component {
             <div className="book-shelf-changer">
             {/* https://reactjs.org/docs/forms.html */}
               <select 
-              // this doesn't work currently, but we need a way to accomplish this
-              // so that in search we show the same status for the book that we have on
-              // the main app page
-                value={book.shelf || bookStatus} 
-                onChange={(event) => onShelfChange(event.target.value, book)}
+              // For the value of select it's either 
+              // 1) the book's shelf is already known
+              // 2) we're setting it right now with the state, or 
+              // 3) it's not set so the shelf tells us what it is
+                value={booksAndShelves[book.id] || shelfType || bookStatus}
+                onChange={(event) => this._handleShelfChange(event.target.value, onShelfChange, book)}
               >
                 <option value="move" disabled>Move to...</option>
                 <option value="currentlyReading">Currently Reading</option>

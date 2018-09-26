@@ -6,9 +6,10 @@ import Shelf from './Shelf'
 import Search from './Search'
 
 // TODOs
-// Handle searches with API
-// Handle state between search page and main page (needs to be in sync)
-// Change data model for client to hold information for each bucket? (Need to use in search - there's no shelf returned in search API)
+// Test App more and review rubric
+// Clean up code
+// Add comments on methods and components
+// Updated PropTypes on components
 
 class BooksApp extends React.Component {
   state = {
@@ -19,13 +20,23 @@ class BooksApp extends React.Component {
      * pages, as well as provide a good URL they can bookmark and share.
      */
     books: [],
+    bookIdsAndShelf: {},
+  }
 
+  _updateBooksAndShelves(booksArray) {
+    let temp = {};
+    for (const book of booksArray) {
+      temp[book.id] = book.shelf;
+    }
+    return temp;
   }
 
   componentDidMount() {
     BooksAPI.getAll()
       .then((books) => {
         this.setState({ books });
+        this.setState({ bookIdsAndShelf: this._updateBooksAndShelves(books) });
+        console.log(this.state.bookIdsAndShelf);
       })
       .catch(() => {
         console.log('getAll Api request failed');
@@ -33,17 +44,21 @@ class BooksApp extends React.Component {
   }
 
   updateBook = (shelf, changedBook) => {
-    const copy = [];
+    const booksCopy = [];
+    const IdsShelfCopy = {};
     let inCurrentBooks = false;
     this.state.books.forEach((book) => {
       if (book.id === changedBook.id) {
         book.shelf = shelf;
         inCurrentBooks = true;
       }
-      copy.push(book);
+      booksCopy.push(book);
+      IdsShelfCopy[book.id] = book.shelf;
     });
     if (!inCurrentBooks) {
-      copy.push(changedBook);
+      changedBook.shelf = shelf;
+      booksCopy.push(changedBook);
+      IdsShelfCopy[changedBook.id] = shelf;
     }
     // Just log the update for now to compare. The API output here is
     // shelfType: [id1, id2, etc.], where shelfType is 'currentlyReading', 'read', 'wantToRead'
@@ -54,7 +69,8 @@ class BooksApp extends React.Component {
       .catch(() => {
         console.log('update Api call failed');
       })
-    this.setState(() => ({ books: copy }));
+    this.setState(() => ({ books: booksCopy }));
+    this.setState({ bookIdsAndShelf : IdsShelfCopy });
   }
 
   render() {
@@ -81,6 +97,7 @@ class BooksApp extends React.Component {
                         books={this.state.books.filter((b) => b.shelf === k)}
                         shelfName={shelves[k]}
                         shelfType={k}
+                        booksAndShelves={this.state.bookIdsAndShelf}
                         onShelfChange={this.updateBook}
                         key={k}
                       />
@@ -94,7 +111,7 @@ class BooksApp extends React.Component {
             </div>
           )} />
           <Route path='/search' render={({ history }) => (
-            <Search onShelfChange={this.updateBook} />
+            <Search booksAndShelves={this.state.bookIdsAndShelf} onShelfChange={this.updateBook} />
           )} />
         </div>
       </BrowserRouter>
