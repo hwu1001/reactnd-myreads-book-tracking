@@ -23,7 +23,6 @@ class Search extends Component {
   * @return {undefined}
   */
   updateQuery = (query) => {
-    console.log(query);
     this.setState({ query: query })
     this.searchForBooks(query);
   }
