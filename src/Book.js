@@ -7,8 +7,8 @@ class Book extends Component {
   }
 
   _handleShelfChange = (shelfType, onShelfChangeCb, book) => {
-    onShelfChangeCb(shelfType, book);
-    this.setState({ shelfType : shelfType});
+    onShelfChangeCb(shelfType, book); // App.updateBook
+    this.setState({ shelfType: shelfType });
   }
 
   render() {
@@ -17,7 +17,8 @@ class Book extends Component {
     const style = {
       width: 128,
       height: 193,
-      backgroundImage: `url("${book.imageLinks.thumbnail}")`,
+      // Just use simple placeholder if we don't have an image
+      backgroundImage: (book.imageLinks && book.imageLinks.thumbnail) ? `url("${book.imageLinks.thumbnail}")` : 'https://via.placeholder.com/130x200',
     }
 
     return (
@@ -27,12 +28,12 @@ class Book extends Component {
             <div className="book-cover" style={style}>
             </div>
             <div className="book-shelf-changer">
-            {/* https://reactjs.org/docs/forms.html */}
-              <select 
-              // For the value of select it's either 
-              // 1) the book's shelf is already known
-              // 2) we're setting it right now with the state, or 
-              // 3) it's not set so the shelf tells us what it is
+              {/* https://reactjs.org/docs/forms.html */}
+              <select
+                // For the value of select it's either 
+                // 1) the book's shelf is already known
+                // 2) we're setting it right now with the state, or 
+                // 3) it's not set so the shelf tells us what it is
                 value={booksAndShelves[book.id] || shelfType || bookStatus}
                 onChange={(event) => this._handleShelfChange(event.target.value, onShelfChange, book)}
               >
@@ -60,11 +61,12 @@ Book.propTypes = {
     authors: PropTypes.array, // this isn't always returned in the API
     imageLinks: PropTypes.shape({
       smallThumbnail: PropTypes.string,
-      thumbnail: PropTypes.string.isRequired,
+      thumbnail: PropTypes.string,
     }),
     id: PropTypes.string.isRequired,
   }).isRequired,
   bookStatus: PropTypes.string.isRequired,
+  booksAndShelves: PropTypes.object,
   onShelfChange: PropTypes.func.isRequired,
 };
 

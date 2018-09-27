@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import sortBy from 'sort-by'
@@ -13,36 +14,35 @@ class Search extends Component {
   }
 
   updateQuery = (query) => {
-    this.setState({ query: query.trim() })
-  }
-
-  clearQuery = () => {
-    this.updateQuery('');
+    console.log(query);
+    this.setState({ query: query })
+    this.searchForBooks(query);
   }
 
   searchForBooks = (query) => {
-    // If there's no query don't call the API
+    // If there's no query don't call the API and
+    // update state to get a repaint to let the user know
     if (!query) {
+      this.setState({ searchResults: [] });
+      this.setState({ searchText: '' });
       return;
     }
     BooksAPI.search(query)
       .then((books) => {
-        console.log(books);
         if (books && !books.error) {
           books.sort(sortBy('title'));
-          this.setState({ searchResults : books });
+          this.setState({ searchResults: books });
         }
         else {
-          this.setState({ searchText : 'No results found'});
+          // On error or if the search results in no matches, then reset searchResults
+          // and let the user know
+          this.setState({ searchResults: [] });
+          this.setState({ searchText: 'No results found' });
         }
       })
-  }
-
-  _handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      console.log(this.state.query);
-      this.searchForBooks(this.state.query);
-    }
+      .catch(() => {
+        this.setState({ searchText: 'Could not return results from the database' });
+      })
   }
 
   render() {
@@ -62,28 +62,31 @@ class Search extends Component {
                 However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
                 you don't find a specific author or title. Every search is limited by search terms.
               */}
-            <input 
+            <input
               type="text"
-              placeholder="Search by title or author" 
+              placeholder="Search by title or author"
               value={query}
               onChange={(event) => this.updateQuery(event.target.value)}
-              onKeyPress={(event) => this._handleKeyPress(event)}
             />
 
           </div>
         </div>
         <div className="search-books-results">
-          {/* <ol className="books-grid"></ol> */}
           {searchResults.length > 0 ? (
-            <Shelf books={searchResults} shelfName={'Search Results'} shelfType={'move'} booksAndShelves={booksAndShelves} onShelfChange={onShelfChange}/>
+            <Shelf books={searchResults} shelfName={'Search Results'} shelfType={'move'} booksAndShelves={booksAndShelves} onShelfChange={onShelfChange} />
           ) : (
-            <div>{searchText}</div>
-          )}
-          
+              <div>{searchText}</div>
+            )}
+
         </div>
       </div>
     )
   }
+}
+
+Search.propTypes = {
+  booksAndShelves: PropTypes.object,
+  onShelfChange: PropTypes.func.isRequired,
 }
 
 export default Search

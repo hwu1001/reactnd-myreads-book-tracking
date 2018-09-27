@@ -6,20 +6,17 @@ import Shelf from './Shelf'
 import Search from './Search'
 
 // TODOs
-// Test App more and review rubric
 // Clean up code
 // Add comments on methods and components
-// Updated PropTypes on components
 
 class BooksApp extends React.Component {
   state = {
-    /**
-     * TODO: Instead of using this state variable to keep track of which page
-     * we're on, use the URL in the browser's address bar. This will ensure that
-     * users can use the browser's back and forward buttons to navigate between
-     * pages, as well as provide a good URL they can bookmark and share.
-     */
+    // This is the data structure returned from BooksAPI.getAll()
+    // It's an array of objects
     books: [],
+    // This is an object where the key is the book ID from the API
+    // and the value is the shelf it belongs on - 'currentlyReading',
+    // 'wantToRead', or 'read'
     bookIdsAndShelf: {},
   }
 
@@ -36,7 +33,6 @@ class BooksApp extends React.Component {
       .then((books) => {
         this.setState({ books });
         this.setState({ bookIdsAndShelf: this._updateBooksAndShelves(books) });
-        console.log(this.state.bookIdsAndShelf);
       })
       .catch(() => {
         console.log('getAll Api request failed');
@@ -64,13 +60,14 @@ class BooksApp extends React.Component {
     // shelfType: [id1, id2, etc.], where shelfType is 'currentlyReading', 'read', 'wantToRead'
     BooksAPI.update(changedBook, shelf)
       .then((books) => {
-        console.log(books);
+        // console.log(books);
+        // Letting the server know the update, but don't need the return data for local storage
       })
       .catch(() => {
         console.log('update Api call failed');
       })
-    this.setState(() => ({ books: booksCopy }));
-    this.setState({ bookIdsAndShelf : IdsShelfCopy });
+    this.setState({ books: booksCopy });
+    this.setState({ bookIdsAndShelf: IdsShelfCopy });
   }
 
   render() {
@@ -84,31 +81,35 @@ class BooksApp extends React.Component {
       <BrowserRouter>
         <div className="app">
           <Route exact path='/' render={() => (
-            <div className="list-books">
-              <div className="list-books-title">
-                <h1>MyReads</h1>
-              </div>
-              <div className="list-books-content">
-                <div>
-                  {/* https://stackoverflow.com/a/47402440 */}
-                  {Object.keys(shelves).map((k) => {
-                    return (
-                      <Shelf
-                        books={this.state.books.filter((b) => b.shelf === k)}
-                        shelfName={shelves[k]}
-                        shelfType={k}
-                        booksAndShelves={this.state.bookIdsAndShelf}
-                        onShelfChange={this.updateBook}
-                        key={k}
-                      />
-                    )
-                  })}
+            this.state.books.length > 0 ? (
+              <div className="list-books">
+                <div className="list-books-title">
+                  <h1>MyReads</h1>
+                </div>
+                <div className="list-books-content">
+                  <div>
+                    {/* https://stackoverflow.com/a/47402440 */}
+                    {Object.keys(shelves).map((k) => {
+                      return (
+                        <Shelf
+                          books={this.state.books.filter((b) => b.shelf === k)}
+                          shelfName={shelves[k]}
+                          shelfType={k}
+                          booksAndShelves={this.state.bookIdsAndShelf}
+                          onShelfChange={this.updateBook}
+                          key={k}
+                        />
+                      )
+                    })}
+                  </div>
+                </div>
+                <div className="open-search">
+                  <Link to='/search'>Add a book</Link>
                 </div>
               </div>
-              <div className="open-search">
-                <Link to='/search'>Add a book</Link>
-              </div>
-            </div>
+            ) : (
+                <div>No books available or cannot return data from the server.</div>
+              )
           )} />
           <Route path='/search' render={({ history }) => (
             <Search booksAndShelves={this.state.bookIdsAndShelf} onShelfChange={this.updateBook} />
