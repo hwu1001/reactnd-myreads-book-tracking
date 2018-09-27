@@ -5,6 +5,9 @@ import * as BooksAPI from './BooksAPI'
 import sortBy from 'sort-by'
 import Shelf from './Shelf';
 
+/**
+* @description Represents a search page
+*/
 class Search extends Component {
 
   state = {
@@ -13,12 +16,23 @@ class Search extends Component {
     searchResults: []
   }
 
+  /**
+  * @description Handles when the query string is updated by the user
+  * @param {string} query - The query string input by the user
+  * @param {string} author - The author of the book
+  * @return {undefined}
+  */
   updateQuery = (query) => {
     console.log(query);
     this.setState({ query: query })
     this.searchForBooks(query);
   }
 
+  /**
+  * @description Calls the API with the query string and updates the search page's state
+  * @param {string} query - The query string input by the user
+  * @returns {undefined}
+  */
   searchForBooks = (query) => {
     // If there's no query don't call the API and
     // update state to get a repaint to let the user know
@@ -45,6 +59,10 @@ class Search extends Component {
       })
   }
 
+  /**
+  * @description Renders the search page
+  * @returns {undefined}
+  */
   render() {
     const { booksAndShelves, onShelfChange } = this.props;
     const { query, searchText, searchResults } = this.state;
@@ -85,7 +103,9 @@ class Search extends Component {
 }
 
 Search.propTypes = {
+  // An object where the key is the book identifier and the value is the shelf the book belongs on (e.g., 'read')
   booksAndShelves: PropTypes.object,
+  // Callback function used to update book's shelf in Book component
   onShelfChange: PropTypes.func.isRequired,
 }
 

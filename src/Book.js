@@ -1,16 +1,30 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+/**
+* @description Represents a book
+*/
 class Book extends Component {
   state = {
     shelfType: '',
   }
 
+  /**
+  * @description Calls the API with the query string and updates the search page's state
+  * @param {string} shelfType - One of the designated shelf types ('read', 'wantToRead', 'currentlyReading')
+  * @param {function} onShelfChangeCb - Callback function used to update book's shelf in Book component
+  * @param {object} book - The book being updated
+  * @returns {undefined}
+  */
   _handleShelfChange = (shelfType, onShelfChangeCb, book) => {
     onShelfChangeCb(shelfType, book); // App.updateBook
     this.setState({ shelfType: shelfType });
   }
 
+  /**
+  * @description Renders the book component
+  * @returns {undefined}
+  */
   render() {
     const { book, bookStatus, booksAndShelves, onShelfChange } = this.props;
     const { shelfType } = this.state;
@@ -56,6 +70,7 @@ class Book extends Component {
 }
 
 Book.propTypes = {
+  // Object that represent a book to display
   book: PropTypes.shape({
     title: PropTypes.string.isRequired,
     authors: PropTypes.array, // this isn't always returned in the API
@@ -65,8 +80,11 @@ Book.propTypes = {
     }),
     id: PropTypes.string.isRequired,
   }).isRequired,
+  // Used as a value to identify which shelf a book goes on (e.g., 'wantToRead')
   bookStatus: PropTypes.string.isRequired,
+  // An object where the key is the book identifier and the value is the shelf the book belongs on (e.g., 'read')
   booksAndShelves: PropTypes.object,
+  // Callback function used to update book's shelf in Book component
   onShelfChange: PropTypes.func.isRequired,
 };
 

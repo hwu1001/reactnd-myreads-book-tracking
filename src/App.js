@@ -6,9 +6,12 @@ import Shelf from './Shelf'
 import Search from './Search'
 
 // TODOs
-// Clean up code
-// Add comments on methods and components
+// Throttle and debounce searches
+// Clean up storage on client since data is duplicated
 
+/**
+* @description Represents the entire Book App handler
+*/
 class BooksApp extends React.Component {
   state = {
     // This is the data structure returned from BooksAPI.getAll()
@@ -20,6 +23,11 @@ class BooksApp extends React.Component {
     bookIdsAndShelf: {},
   }
 
+  /**
+  * @description Handles the initial creation of this.state.bookIdsAndShelf
+  * @param {Array} booksArray - The array of book objects returned from the getAll() API
+  * @returns {object} - An object where key is book identifier and value is shelf type
+  */
   _updateBooksAndShelves(booksArray) {
     let temp = {};
     for (const book of booksArray) {
@@ -28,6 +36,10 @@ class BooksApp extends React.Component {
     return temp;
   }
 
+  /**
+  * @description Handles when the Book App mounts on the page
+  * @returns {undefined}
+  */
   componentDidMount() {
     BooksAPI.getAll()
       .then((books) => {
@@ -39,6 +51,12 @@ class BooksApp extends React.Component {
       });
   }
 
+  /**
+  * @description Handles the initial creation of this.state.bookIdsAndShelf
+  * @param {string} shelf - One of the designated shelf types ('read', 'wantToRead', 'currentlyReading')
+  * @param {object} changedBook - The book being updated
+  * @returns {undefined}
+  */
   updateBook = (shelf, changedBook) => {
     const booksCopy = [];
     const IdsShelfCopy = {};
@@ -70,6 +88,10 @@ class BooksApp extends React.Component {
     this.setState({ bookIdsAndShelf: IdsShelfCopy });
   }
 
+  /**
+  * @description Renders the initial Book App component
+  * @returns {undefined}
+  */
   render() {
     // Ideally these display names would come from the server but we'll hardcode them for now
     const shelves = {
