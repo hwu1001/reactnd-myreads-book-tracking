@@ -5,10 +5,6 @@ import './App.css'
 import Shelf from './Shelf'
 import Search from './Search'
 
-// TODOs
-// Throttle and debounce searches
-// Clean up storage on client since data is duplicated
-
 /**
 * @description Represents the entire Book App handler
 */
